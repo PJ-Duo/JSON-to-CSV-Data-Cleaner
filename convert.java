@@ -1,4 +1,7 @@
 import java.util.Arrays;
+
+import javax.swing.text.StyledEditorKit.BoldAction;
+
 import java.util.ArrayList;
 import java.io.File; // Import the File class
 import java.io.IOException; // Import the IOException class to handle errors
@@ -13,7 +16,8 @@ public class convert {
 
         String[] content = Arrays.copyOfRange(data, 1, data.length - 1);
 
-        String[] swearWords = { "fuck", "shit", "damn", "asshole", "bitch" };
+        String[] swearWords = { "fuck", "shit", "damn", "asshole", "bitch", "nigger", "nigga", "@", "<", "https",
+                "http" };
 
         // System.out.println(Arrays.toString(content));
 
@@ -21,7 +25,9 @@ public class convert {
 
         int s = 0;
         for (int i = 0; i < content.length; i++) {
-            String temp = content[i].replace(':', ',');
+            String temp = content[i].replace("\": \"", "\",\"");
+           // int index = content[i].indexOf("\": \"");
+
             // System.out.println(temp);
             s = 0;
             for (String word : temp.split("\\s+")) { // split string into words
@@ -46,15 +52,34 @@ public class convert {
 
                 FileWriter myWriter = new FileWriter(".//out.csv");
                 // myWriter.write("msg, reply\\n");
-
+                String[] sp = { "https", "<", ">", "@", "\\","//","{","}"};
+                boolean dontWrite = false;
                 for (int counter = 0; counter < csv.size(); counter++) {
+                    dontWrite = false;
                     String myString = csv.get(counter);
                     String input = myString.substring(0, myString.length() - 1);
-                    
-                    String output = input.replaceAll("\"([^\"]*)\"", "$1".replaceAll("[^\\p{ASCII}\\p{L}\\p{N}\\p{P}\\s]+", ""));
 
+                    // String output = input.replaceAll("\"([^\"]*)\"",
+                    // "$1".replaceAll("[^\\p{ASCII}\\p{L}\\p{N}\\p{P}\\s]+", ""));
+                    String output = input.replace(':', ',').trim();
+                    // if (output.contains("https") == false && output.contains("<") == false
+                    // && output.contains("\\") == false && output.contains("{") == false) {
+
+                    // }
+
+                    for (int i = 0; i < sp.length; i++) {
+                        if (output.contains(sp[i]) == true) {
+                            dontWrite = true;
+                            System.out.println(output);
+                            break;
+                        }
+                    }
+
+                    if (dontWrite != true) {
                         myWriter.write(output + "\n");
+                    }
                     
+
                 }
 
                 myWriter.close();
